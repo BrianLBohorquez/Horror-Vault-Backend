@@ -13,20 +13,10 @@ It has a sign-up/login feature so people can browse the selection and save movie
 - Database: PostgreSQL
 - Backend: Node.js and Express
 - Data: my Letterboxd export and the TMDB API for posters
-- Tools: Thunder Client and GitHub Projects
-
-## Architecture
-
-The backend is an Express API connected to the PostgreSQL database, and the React frontend calls it with fetch. The frontend is in the Horror-Vault-Frontend repo.
-
-Horror-Vault-Backend
-api - routes
-db - schema, seed and Letterboxd data
-queries - SQL for each table
-middleware - login and request checks
-utils - login tokens
 
 ## Database schema
+
+TODO: Update both this and API at the end
 
 ```sql
 CREATE TABLE users (
@@ -46,6 +36,8 @@ CREATE TABLE movies (
   year integer,
   poster_url text,
   subgenre_id integer NOT NULL REFERENCES subgenres(id) ON DELETE CASCADE,
+  subgenre_2_id integer REFERENCES subgenres(id) ON DELETE CASCADE,
+  subgenre_3_id integer REFERENCES subgenres(id) ON DELETE CASCADE,
   rating decimal,
   review text,
   liked boolean NOT NULL DEFAULT false,
@@ -100,14 +92,6 @@ Watchlist (must be logged in)
 Comments (must be logged in)
 
 - DELETE /comments/:id - deletes the user's own comment (comments)
-
-## Usage
-
-1. Create a PostgreSQL database named horror_vault.
-2. Copy example.env to .env and fill in the environment variables. TMDB_TOKEN is used by the seed to get the posters.
-3. Run npm install
-4. Run npm run db:reset.
-5. Then run npm run dev.
 
 ## Credits
 

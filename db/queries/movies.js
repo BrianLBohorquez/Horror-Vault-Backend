@@ -5,6 +5,8 @@ export async function createMovie(
   year,
   posterUrl,
   subgenreId,
+  subgenre2Id,
+  subgenre3Id,
   rating,
   review,
   liked,
@@ -12,9 +14,9 @@ export async function createMovie(
 ) {
   const sql = `
   INSERT INTO movies
-    (title, year, poster_url, subgenre_id, rating, review, liked, date_logged)
+    (title, year, poster_url, subgenre_id, subgenre_2_id, subgenre_3_id, rating, review, liked, date_logged)
   VALUES
-    ($1, $2, $3, $4, $5, $6, $7, $8)
+    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
   RETURNING *
   `;
   const {
@@ -24,6 +26,8 @@ export async function createMovie(
     year,
     posterUrl,
     subgenreId,
+    subgenre2Id,
+    subgenre3Id,
     rating,
     review,
     liked,
@@ -34,10 +38,16 @@ export async function createMovie(
 
 export async function getMovies() {
   const sql = `
-  SELECT movies.*, subgenres.name AS subgenre
+  SELECT
+    movies.*,
+    subgenres.name AS subgenre,
+    subgenres_2.name AS subgenre_2,
+    subgenres_3.name AS subgenre_3
   FROM
     movies
     JOIN subgenres ON subgenres.id = movies.subgenre_id
+    LEFT JOIN subgenres AS subgenres_2 ON subgenres_2.id = movies.subgenre_2_id
+    LEFT JOIN subgenres AS subgenres_3 ON subgenres_3.id = movies.subgenre_3_id
   ORDER BY title
   `;
   const { rows: movies } = await db.query(sql);
@@ -46,10 +56,16 @@ export async function getMovies() {
 
 export async function getMovieById(id) {
   const sql = `
-  SELECT movies.*, subgenres.name AS subgenre
+  SELECT
+    movies.*,
+    subgenres.name AS subgenre,
+    subgenres_2.name AS subgenre_2,
+    subgenres_3.name AS subgenre_3
   FROM
     movies
     JOIN subgenres ON subgenres.id = movies.subgenre_id
+    LEFT JOIN subgenres AS subgenres_2 ON subgenres_2.id = movies.subgenre_2_id
+    LEFT JOIN subgenres AS subgenres_3 ON subgenres_3.id = movies.subgenre_3_id
   WHERE movies.id = $1
   `;
   const {
@@ -60,10 +76,16 @@ export async function getMovieById(id) {
 
 export async function getRecentMovies() {
   const sql = `
-  SELECT movies.*, subgenres.name AS subgenre
+  SELECT
+    movies.*,
+    subgenres.name AS subgenre,
+    subgenres_2.name AS subgenre_2,
+    subgenres_3.name AS subgenre_3
   FROM
     movies
     JOIN subgenres ON subgenres.id = movies.subgenre_id
+    LEFT JOIN subgenres AS subgenres_2 ON subgenres_2.id = movies.subgenre_2_id
+    LEFT JOIN subgenres AS subgenres_3 ON subgenres_3.id = movies.subgenre_3_id
   ORDER BY date_logged DESC
   LIMIT 10
   `;
@@ -73,10 +95,16 @@ export async function getRecentMovies() {
 
 export async function getRandomMovies() {
   const sql = `
-  SELECT movies.*, subgenres.name AS subgenre
+  SELECT
+    movies.*,
+    subgenres.name AS subgenre,
+    subgenres_2.name AS subgenre_2,
+    subgenres_3.name AS subgenre_3
   FROM
     movies
     JOIN subgenres ON subgenres.id = movies.subgenre_id
+    LEFT JOIN subgenres AS subgenres_2 ON subgenres_2.id = movies.subgenre_2_id
+    LEFT JOIN subgenres AS subgenres_3 ON subgenres_3.id = movies.subgenre_3_id
   WHERE movies.rating >= 4
   ORDER BY random()
   LIMIT 4
@@ -87,11 +115,21 @@ export async function getRandomMovies() {
 
 export async function getSimilarMovies(subgenreId, movieId) {
   const sql = `
-  SELECT movies.*, subgenres.name AS subgenre
+  SELECT
+    movies.*,
+    subgenres.name AS subgenre,
+    subgenres_2.name AS subgenre_2,
+    subgenres_3.name AS subgenre_3
   FROM
     movies
     JOIN subgenres ON subgenres.id = movies.subgenre_id
-  WHERE movies.subgenre_id = $1
+    LEFT JOIN subgenres AS subgenres_2 ON subgenres_2.id = movies.subgenre_2_id
+    LEFT JOIN subgenres AS subgenres_3 ON subgenres_3.id = movies.subgenre_3_id
+  WHERE (
+      movies.subgenre_id = $1
+      OR movies.subgenre_2_id = $1
+      OR movies.subgenre_3_id = $1
+    )
     AND movies.id <> $2
     AND movies.rating IS NOT NULL
   ORDER BY movies.liked DESC, movies.rating DESC
