@@ -15,9 +15,12 @@ async function seed() {
 
   const subgenreIds = {};
   for (const movie of movies) {
-    if (!subgenreIds[movie.subgenre]) {
-      const subgenre = await createSubgenre(movie.subgenre);
-      subgenreIds[movie.subgenre] = subgenre.id;
+    const names = [movie.subgenre, movie.subgenre_2, movie.subgenre_3];
+    for (const name of names) {
+      if (name && !subgenreIds[name]) {
+        const subgenre = await createSubgenre(name);
+        subgenreIds[name] = subgenre.id;
+      }
     }
 
     const posterUrl = await getPosterUrl(movie.title, movie.year);
@@ -26,6 +29,8 @@ async function seed() {
       movie.year,
       posterUrl,
       subgenreIds[movie.subgenre],
+      subgenreIds[movie.subgenre_2] || null,
+      subgenreIds[movie.subgenre_3] || null,
       movie.my_rating || null,
       movie.my_review || null,
       movie.liked === "yes",
