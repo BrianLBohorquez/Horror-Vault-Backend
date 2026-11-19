@@ -9,6 +9,7 @@ await seed();
 await db.end();
 console.log("🌱 Database seeded.");
 
+/** Reads the movie CSV and adds every subgenre and movie to the database. */
 async function seed() {
   const csv = fs.readFileSync("db/horror_movies.csv", "utf8");
   const movies = parse(csv, { columns: true });
@@ -39,6 +40,7 @@ async function seed() {
   }
 }
 
+/** Looks up a movie's poster on TMDB by its title and year, or returns null if there isn't one. */
 async function getPosterUrl(title, year) {
   const response = await fetch(
     `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(title)}&year=${year}`,

@@ -1,5 +1,6 @@
 import db from "#db/client";
 
+/** Adds a subgenre and returns it. */
 export async function createSubgenre(name) {
   const sql = `
   INSERT INTO subgenres
@@ -14,6 +15,7 @@ export async function createSubgenre(name) {
   return subgenre;
 }
 
+/** Gets every subgenre in alphabetical order. */
 export async function getSubgenres() {
   const sql = `
   SELECT *

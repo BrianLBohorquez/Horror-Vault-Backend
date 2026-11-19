@@ -1,5 +1,6 @@
 import db from "#db/client";
 
+/** Adds a movie to the database and returns it. */
 export async function createMovie(
   title,
   year,
@@ -36,6 +37,10 @@ export async function createMovie(
   return movie;
 }
 
+/**
+ * Gets the movies that match the search and tags, sorted by the given column and order.
+ * Leaves out the user's watched movies when a user ID is given.
+ */
 export async function getMovies(
   search,
   showTags,
@@ -86,6 +91,7 @@ export async function getMovies(
   return movies;
 }
 
+/** Gets one movie by its ID, with its subgenre names. */
 export async function getMovieById(id) {
   const sql = `
   SELECT
@@ -106,6 +112,7 @@ export async function getMovieById(id) {
   return movie;
 }
 
+/** Gets the 10 most recently logged movies. */
 export async function getRecentMovies() {
   const sql = `
   SELECT
@@ -125,6 +132,7 @@ export async function getRecentMovies() {
   return movies;
 }
 
+/** Gets 4 random movies rated 4 or higher. */
 export async function getRandomMovies() {
   const sql = `
   SELECT
@@ -145,6 +153,7 @@ export async function getRandomMovies() {
   return movies;
 }
 
+/** Gets up to 6 rated movies that share the given subgenre, liked and highest rated first. */
 export async function getSimilarMovies(subgenreId, movieId) {
   const sql = `
   SELECT

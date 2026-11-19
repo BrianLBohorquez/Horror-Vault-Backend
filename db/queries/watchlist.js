@@ -1,5 +1,6 @@
 import db from "#db/client";
 
+/** Adds a movie to a user's watchlist and returns the new item. */
 export async function createWatchlistItem(userId, movieId) {
   const sql = `
   INSERT INTO watchlist
@@ -14,6 +15,7 @@ export async function createWatchlistItem(userId, movieId) {
   return item;
 }
 
+/** Gets a user's watchlist with each movie's title, year and poster, unwatched and newest first. */
 export async function getWatchlistByUserId(userId) {
   const sql = `
   SELECT watchlist.*, movies.title, movies.year, movies.poster_url
@@ -27,6 +29,7 @@ export async function getWatchlistByUserId(userId) {
   return watchlist;
 }
 
+/** Gets one watchlist item by its ID. */
 export async function getWatchlistItemById(id) {
   const sql = `
   SELECT *
@@ -39,6 +42,7 @@ export async function getWatchlistItemById(id) {
   return item;
 }
 
+/** Marks a watchlist item as watched or unwatched and returns it. */
 export async function updateWatchlistItemById(id, watched) {
   const sql = `
   UPDATE watchlist
@@ -52,6 +56,7 @@ export async function updateWatchlistItemById(id, watched) {
   return item;
 }
 
+/** Deletes a watchlist item. */
 export async function deleteWatchlistItemById(id) {
   const sql = `
   DELETE FROM watchlist
