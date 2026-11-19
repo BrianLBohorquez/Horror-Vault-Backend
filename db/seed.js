@@ -47,7 +47,9 @@ async function getPosterUrl(title, year) {
   const result = await response.json();
   if (!response.ok) throw Error(result.status_message);
 
-  const match = result.results[0];
+  const match =
+    result.results.find((movie) => movie.title === title) ||
+    result.results[0];
   if (!match || !match.poster_path) return null;
   return "https://image.tmdb.org/t/p/w500" + match.poster_path;
 }
