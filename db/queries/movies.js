@@ -36,7 +36,23 @@ export async function createMovie(
   return movie;
 }
 
-export async function getMovies() {
+export async function getMovies(
+  search,
+  showTags,
+  hideTags,
+  sort,
+  order,
+  userId,
+) {
+  const columns = {
+    title: "movies.title",
+    year: "movies.year",
+    logged: "movies.date_logged",
+    rating: "movies.rating",
+  };
+  const column = columns[sort] || "movies.title";
+  const direction = order === "desc" ? "DESC" : "ASC";
+
   const sql = `
   SELECT
     movies.*,
@@ -48,9 +64,25 @@ export async function getMovies() {
     JOIN subgenres ON subgenres.id = movies.subgenre_id
     LEFT JOIN subgenres AS subgenres_2 ON subgenres_2.id = movies.subgenre_2_id
     LEFT JOIN subgenres AS subgenres_3 ON subgenres_3.id = movies.subgenre_3_id
-  ORDER BY title
+  WHERE movies.title ILIKE $1
+    AND $2::text[] <@ ARRAY[subgenres.name, subgenres_2.name, subgenres_3.name]
+    AND NOT (
+      ARRAY[subgenres.name, subgenres_2.name, subgenres_3.name] && $3::text[]
+    )
+    AND (
+      $4::integer IS NULL
+      OR movies.id NOT IN (
+        SELECT movie_id FROM watchlist WHERE user_id = $4 AND watched = true
+      )
+    )
+  ORDER BY ${column} ${direction} NULLS LAST, movies.title
   `;
-  const { rows: movies } = await db.query(sql);
+  const { rows: movies } = await db.query(sql, [
+    "%" + search + "%",
+    showTags,
+    hideTags,
+    userId,
+  ]);
   return movies;
 }
 

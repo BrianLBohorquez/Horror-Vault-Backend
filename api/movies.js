@@ -14,7 +14,25 @@ import requireBody from "#middleware/requireBody";
 import requireUser from "#middleware/requireUser";
 
 router.get("/", async (req, res) => {
-  const movies = await getMovies();
+  const {
+    search = "",
+    show = "",
+    hide = "",
+    sort = "title",
+    order = "asc",
+    watched = "",
+  } = req.query;
+  const showTags = show ? show.split(",") : [];
+  const hideTags = hide ? hide.split(",") : [];
+  const userId = req.user && watched === "hide" ? req.user.id : null;
+  const movies = await getMovies(
+    search,
+    showTags,
+    hideTags,
+    sort,
+    order,
+    userId,
+  );
   res.send(movies);
 });
 
