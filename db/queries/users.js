@@ -1,6 +1,7 @@
 import db from "#db/client";
 import bcrypt from "bcrypt";
 
+/** Adds a user with a hashed password and returns it. */
 export async function createUser(username, password) {
   const sql = `
   INSERT INTO users
@@ -16,6 +17,7 @@ export async function createUser(username, password) {
   return user;
 }
 
+/** Gets the user with the given username if the password matches, or null if it doesn't. */
 export async function getUserByUsernameAndPassword(username, password) {
   const sql = `
   SELECT *
@@ -33,6 +35,7 @@ export async function getUserByUsernameAndPassword(username, password) {
   return user;
 }
 
+/** Gets one user by their ID. */
 export async function getUserById(id) {
   const sql = `
   SELECT *

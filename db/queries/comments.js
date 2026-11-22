@@ -1,5 +1,6 @@
 import db from "#db/client";
 
+/** Adds a comment to a movie and returns it. */
 export async function createComment(userId, movieId, body) {
   const sql = `
   INSERT INTO comments
@@ -14,6 +15,7 @@ export async function createComment(userId, movieId, body) {
   return comment;
 }
 
+/** Gets a movie's comments with each commenter's username, newest first. */
 export async function getCommentsByMovieId(movieId) {
   const sql = `
   SELECT comments.*, users.username
@@ -27,6 +29,7 @@ export async function getCommentsByMovieId(movieId) {
   return comments;
 }
 
+/** Gets one comment by its ID. */
 export async function getCommentById(id) {
   const sql = `
   SELECT *
@@ -39,6 +42,7 @@ export async function getCommentById(id) {
   return comment;
 }
 
+/** Deletes a comment. */
 export async function deleteCommentById(id) {
   const sql = `
   DELETE FROM comments
