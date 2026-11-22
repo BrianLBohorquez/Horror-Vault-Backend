@@ -20,13 +20,15 @@ CREATE TABLE movies (
   title text NOT NULL,
   year integer,
   poster_url text,
+  synopsis text,
   subgenre_id integer NOT NULL REFERENCES subgenres(id) ON DELETE CASCADE,
   subgenre_2_id integer REFERENCES subgenres(id) ON DELETE CASCADE,
   subgenre_3_id integer REFERENCES subgenres(id) ON DELETE CASCADE,
   rating decimal,
   review text,
   liked boolean NOT NULL DEFAULT false,
-  date_logged date
+  date_logged date,
+  letterboxd_url text
 );
 
 CREATE TABLE watchlist (
