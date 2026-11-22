@@ -5,6 +5,7 @@ export async function createMovie(
   title,
   year,
   posterUrl,
+  synopsis,
   subgenreId,
   subgenre2Id,
   subgenre3Id,
@@ -12,12 +13,13 @@ export async function createMovie(
   review,
   liked,
   dateLogged,
+  letterboxdUrl,
 ) {
   const sql = `
   INSERT INTO movies
-    (title, year, poster_url, subgenre_id, subgenre_2_id, subgenre_3_id, rating, review, liked, date_logged)
+    (title, year, poster_url, synopsis, subgenre_id, subgenre_2_id, subgenre_3_id, rating, review, liked, date_logged, letterboxd_url)
   VALUES
-    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
   RETURNING *
   `;
   const {
@@ -26,6 +28,7 @@ export async function createMovie(
     title,
     year,
     posterUrl,
+    synopsis,
     subgenreId,
     subgenre2Id,
     subgenre3Id,
@@ -33,6 +36,7 @@ export async function createMovie(
     review,
     liked,
     dateLogged,
+    letterboxdUrl,
   ]);
   return movie;
 }

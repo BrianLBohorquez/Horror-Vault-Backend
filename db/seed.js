@@ -24,11 +24,12 @@ async function seed() {
       }
     }
 
-    const posterUrl = await getPosterUrl(movie.title, movie.year);
+    const info = await getMovieInfo(movie.title, movie.year);
     await createMovie(
       movie.title,
       movie.year,
-      posterUrl,
+      info.posterUrl,
+      info.synopsis,
       subgenreIds[movie.subgenre],
       subgenreIds[movie.subgenre_2] || null,
       subgenreIds[movie.subgenre_3] || null,
@@ -36,12 +37,13 @@ async function seed() {
       movie.my_review || null,
       movie.liked === "yes",
       movie.date_logged,
+      movie.letterboxd_url,
     );
   }
 }
 
-/** Looks up a movie's poster on TMDB by its title and year, or returns null if there isn't one. */
-async function getPosterUrl(title, year) {
+/** Looks up a movie on TMDB by its title and year and returns its poster and synopsis, or null for either one it doesn't have. */
+async function getMovieInfo(title, year) {
   const response = await fetch(
     `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(title)}&year=${year}`,
     { headers: { Authorization: `Bearer ${process.env.TMDB_TOKEN}` } },
@@ -52,6 +54,10 @@ async function getPosterUrl(title, year) {
   const match =
     result.results.find((movie) => movie.title === title) ||
     result.results[0];
-  if (!match || !match.poster_path) return null;
-  return "https://image.tmdb.org/t/p/w500" + match.poster_path;
+  if (!match) return { posterUrl: null, synopsis: null };
+
+  const posterUrl = match.poster_path
+    ? "https://image.tmdb.org/t/p/w500" + match.poster_path
+    : null;
+  return { posterUrl, synopsis: match.overview || null };
 }
