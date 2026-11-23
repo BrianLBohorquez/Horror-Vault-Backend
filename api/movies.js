@@ -6,10 +6,17 @@ import {
   getMovies,
   getMovieById,
   getRecentMovies,
+  getRandomReviewedMovie,
   getRandomMovies,
   getSimilarMovies,
 } from "#db/queries/movies";
 import { createComment, getCommentsByMovieId } from "#db/queries/comments";
+import {
+  createVote,
+  getVotesByMovieId,
+  getVoteByUserAndMovie,
+  updateVoteById,
+} from "#db/queries/votes";
 import requireBody from "#middleware/requireBody";
 import requireUser from "#middleware/requireUser";
 
@@ -42,8 +49,9 @@ router.get("/recent", async (req, res) => {
 });
 
 router.get("/random", async (req, res) => {
-  const movies = await getRandomMovies();
-  res.send(movies);
+  const reviewedMovie = await getRandomReviewedMovie();
+  const movies = await getRandomMovies(reviewedMovie.id);
+  res.send([reviewedMovie, ...movies]);
 });
 
 router.param("id", async (req, res, next, id) => {
@@ -75,5 +83,28 @@ router.post(
     const { body } = req.body;
     const comment = await createComment(req.user.id, req.movie.id, body);
     res.status(201).send(comment);
+  },
+);
+
+router.get("/:id/votes", async (req, res) => {
+  const votes = await getVotesByMovieId(req.movie.id);
+  res.send(votes);
+});
+
+router.put(
+  "/:id/votes",
+  requireUser,
+  requireBody(["thumbsUp"]),
+  async (req, res) => {
+    const { thumbsUp } = req.body;
+    const vote = await getVoteByUserAndMovie(req.user.id, req.movie.id);
+
+    if (vote) {
+      const updatedVote = await updateVoteById(vote.id, thumbsUp);
+      return res.send(updatedVote);
+    }
+
+    const newVote = await createVote(req.user.id, req.movie.id, thumbsUp);
+    res.status(201).send(newVote);
   },
 );
