@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS shoutouts;
+DROP TABLE IF EXISTS votes;
 DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS watchlist;
 DROP TABLE IF EXISTS movies;
@@ -42,6 +44,21 @@ CREATE TABLE comments (
   id serial PRIMARY KEY,
   user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   movie_id integer NOT NULL REFERENCES movies(id) ON DELETE CASCADE,
+  body text NOT NULL,
+  date_posted date NOT NULL DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE votes (
+  id serial PRIMARY KEY,
+  user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  movie_id integer NOT NULL REFERENCES movies(id) ON DELETE CASCADE,
+  thumbs_up boolean NOT NULL,
+  UNIQUE (user_id, movie_id)
+);
+
+CREATE TABLE shoutouts (
+  id serial PRIMARY KEY,
+  user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   body text NOT NULL,
   date_posted date NOT NULL DEFAULT CURRENT_DATE
 );

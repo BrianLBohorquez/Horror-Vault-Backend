@@ -136,8 +136,8 @@ export async function getRecentMovies() {
   return movies;
 }
 
-/** Gets 4 random movies rated 4 or higher. */
-export async function getRandomMovies() {
+/** Gets 1 random movie rated 4 or higher that has a review. */
+export async function getRandomReviewedMovie() {
   const sql = `
   SELECT
     movies.*,
@@ -150,10 +150,35 @@ export async function getRandomMovies() {
     LEFT JOIN subgenres AS subgenres_2 ON subgenres_2.id = movies.subgenre_2_id
     LEFT JOIN subgenres AS subgenres_3 ON subgenres_3.id = movies.subgenre_3_id
   WHERE movies.rating >= 4
+    AND movies.review IS NOT NULL
   ORDER BY random()
-  LIMIT 4
+  LIMIT 1
   `;
-  const { rows: movies } = await db.query(sql);
+  const {
+    rows: [movie],
+  } = await db.query(sql);
+  return movie;
+}
+
+/** Gets 3 random movies rated 4 or higher, leaving out the given movie. */
+export async function getRandomMovies(movieId) {
+  const sql = `
+  SELECT
+    movies.*,
+    subgenres.name AS subgenre,
+    subgenres_2.name AS subgenre_2,
+    subgenres_3.name AS subgenre_3
+  FROM
+    movies
+    JOIN subgenres ON subgenres.id = movies.subgenre_id
+    LEFT JOIN subgenres AS subgenres_2 ON subgenres_2.id = movies.subgenre_2_id
+    LEFT JOIN subgenres AS subgenres_3 ON subgenres_3.id = movies.subgenre_3_id
+  WHERE movies.rating >= 4
+    AND movies.id <> $1
+  ORDER BY random()
+  LIMIT 3
+  `;
+  const { rows: movies } = await db.query(sql, [movieId]);
   return movies;
 }
 
